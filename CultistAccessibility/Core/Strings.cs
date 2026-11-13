@@ -100,6 +100,23 @@ namespace CultistAccessibility.Core
         public static string GroupAnnounce(string name, int count) => F(nameof(GroupAnnounce), name, count);
         public static string NoVerbs => T();
         public static string NoCards => T();
+        // Sections of the Cards group (Tabletop/CardSections)
+        public static string SectionAbilities => T();
+        public static string SectionFunds => T();
+        public static string SectionIllHealth => T();
+        public static string SectionInfluences => T();
+        public static string SectionFollowers => T();
+        public static string SectionPeople => T();
+        public static string SectionLore => T();
+        public static string SectionBooks => T();
+        public static string SectionTools => T();
+        public static string SectionIngredients => T();
+        public static string SectionMemories => T();
+        public static string SectionWork => T();
+        public static string SectionPlaces => T();
+        public static string SectionReputation => T();
+        public static string SectionOther => T();
+        public static string SectionFaceDown => T();
         public static string VerbCount(int n) => Loc.Plural(nameof(VerbCount), n);
         public static string CardCount(int n) => Loc.Plural(nameof(CardCount), n);
         public static string BusyCount(int n) => Loc.Plural(nameof(BusyCount), n);

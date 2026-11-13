@@ -57,13 +57,20 @@ On the table:
 | Left / Right | Switch group: Verbs (and Mansus portals), Cards, Controls |
 | Enter on a verb | Open its window |
 | Enter on a card | List the verbs that can take it; Enter puts the card in |
+| Page Down / Page Up | In Cards: next section; start of this section, or the previous one |
+| H | Your character and the status bar: health, passion, reason, funds and the game speed |
+| T | Game speed, every busy verb with its time left (soonest first), finished verbs, decaying cards |
+| G | Jump to the next verb with results waiting |
+
+The Cards group is sorted into sections by kind, as sighted players arrange the table by hand: Abilities, Funds and
+assets, Ill health, Influences, Followers, People, Lore, Books, Tools, Ingredients, Memories, Work, Cult and places,
+Reputation, Other cards, then Face down. Only sections that have cards appear. The section's name and card count are
+read when focus enters it; inside a section cards are alphabetical, and a stack is one entry with its count.
+A reads the whole group section by section, and the Table buffer lists the cards in the same order.
 
 A short beep when focus lands on a card means Enter can use it: a verb would take it now, or it is face down and
 turns over. In a verb window the beep marks a slot that a card on the table fits (or that holds a card you can take
 out), and Start when the recipe will start. Items without the beep would only be refused.
-| H | Your character and the status bar: health, passion, reason, funds and the game speed |
-| T | Game speed, every busy verb with its time left (soonest first), finished verbs, decaying cards |
-| G | Jump to the next verb with results waiting |
 
 In a verb window:
 

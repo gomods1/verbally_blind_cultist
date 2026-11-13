@@ -21,6 +21,11 @@ namespace CultistAccessibility.Tabletop
         /// every entry acts alike (verbs, results, choices), so the sound only marks the entries that stand out.
         /// </summary>
         public Func<bool> Actionable;
+        /// <summary>
+        /// Section heading (table cards by kind). Spoken before the entry when focus crosses into a new section;
+        /// Page Up/Down jump between sections. Null: the list has no sections.
+        /// </summary>
+        public string Section;
         /// <summary>Token to point the camera at.</summary>
         public Token Token;
     }

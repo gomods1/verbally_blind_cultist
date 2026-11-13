@@ -108,6 +108,14 @@ namespace CultistAccessibility.SpeechHost
 
         private static void InitContext()
         {
+            string version = PrismNative.FromUtf8(PrismNative.prism_version_string()) ?? "";
+            if (!version.StartsWith(PrismNative.SupportedVersionPrefix, StringComparison.Ordinal))
+            {
+                // Another Prism may lay out PrismConfig differently; passing our struct would corrupt memory.
+                Report("W", "prism " + version + " is not " + PrismNative.SupportedVersionPrefix + "x; starting without availability polling");
+                _ctx = PrismNative.prism_init(IntPtr.Zero);
+                return;
+            }
             var cfg = PrismNative.prism_config_init();
             _callbackKeepAlive = OnAvailabilityChanged;
             cfg.availability_callback = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(_callbackKeepAlive);

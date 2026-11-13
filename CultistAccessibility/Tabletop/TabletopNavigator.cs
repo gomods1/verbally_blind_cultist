@@ -335,6 +335,8 @@ namespace CultistAccessibility.Tabletop
             var e = list[next];
             string text = e.Summary();
             if (ModConfig.Level == Verbosity.Verbose) text += ", " + Strings.PositionOf(next + 1, list.Count);
+            if (e.Section != null && (idx < 0 || list[idx].Section != e.Section))
+                text = Strings.GroupAnnounce(e.Section, list.Count(x => x.Section == e.Section)) + ". " + text;
             Speech.SayFocus(text);
             FocusSideEffects(e);
             return e.Key;
@@ -540,20 +542,15 @@ namespace CultistAccessibility.Tabletop
 
         private List<NavEntry> BuildCards()
         {
-            var cards = GameAccess.TableCards();
-            cards = cards
-                .OrderBy(t => t.Payload.IsShrouded ? 1 : 0)
-                .ThenBy(t => Describer.CardName(t), StringComparer.CurrentCultureIgnoreCase)
-                .ThenBy(t => t.Payload.GetTimeshadow() != null && t.Payload.GetTimeshadow().Transient ? t.Payload.GetTimeshadow().LifetimeRemaining : float.MaxValue)
-                .ToList();
             var list = new List<NavEntry>();
-            foreach (var t in cards)
+            foreach (var kv in CardSections.Sorted(GameAccess.TableCards()))
             {
-                var card = t;
+                var card = kv.Key;
                 list.Add(new NavEntry
                 {
                     Key = card,
                     Token = card,
+                    Section = CardSections.Name(kv.Value),
                     Summary = () => Describer.CardSummary(card),
                     Details = () => Describer.CardDetails(card),
                     Activate = () => OpenVerbPicker(card),
@@ -648,6 +645,8 @@ namespace CultistAccessibility.Tabletop
             else if (KeyInput.Repeat(Key.UpArrow)) MoveBoard(-1);
             else if (KeyInput.Pressed(Key.Home)) MoveBoard(-1, toEnd: true);
             else if (KeyInput.Pressed(Key.End)) MoveBoard(1, toEnd: true);
+            else if (KeyInput.Pressed(Key.PageUp)) JumpSection(-1);
+            else if (KeyInput.Pressed(Key.PageDown)) JumpSection(1);
             else if (KeyInput.Pressed(Key.RightArrow)) SwitchGroup(1);
             else if (KeyInput.Pressed(Key.LeftArrow)) SwitchGroup(-1);
             else if (KeyInput.Pressed(Key.Enter) || KeyInput.Pressed(Key.NumpadEnter))
@@ -669,7 +668,9 @@ namespace CultistAccessibility.Tabletop
             {
                 var list = BuildGroup(_group);
                 if (list.Count == 0) Speech.Say(EmptyGroupText(_group));
-                else Speech.Say(GroupName(_group) + ". " + TextCleaner.Sentences(list.Select(x => x.Summary())));
+                else Speech.Say(GroupName(_group) + ". " + TextCleaner.Sentences(list
+                    .GroupBy(x => x.Section)
+                    .SelectMany(g => (g.Key != null ? new[] { g.Key + ":" } : new string[0]).Concat(g.Select(x => x.Summary())))));
             }
         }
 
@@ -684,13 +685,65 @@ namespace CultistAccessibility.Tabletop
             _groupFocus[_group] = MoveIn(list, _groupFocus[_group], dir, toEnd);
         }
 
+        /// <summary>
+        /// Page Up/Down: first entry of the previous/next section. Page Up inside a section goes to its first entry,
+        /// as in a document. A list without sections is one section (Home/End).
+        /// </summary>
+        private void JumpSection(int dir)
+        {
+            var list = BuildGroup(_group);
+            if (list.Count == 0)
+            {
+                Speech.SayFocus(EmptyGroupText(_group));
+                return;
+            }
+            int idx = Math.Max(0, list.FindIndex(x => Equals(x.Key, _groupFocus[_group])));
+            int start = idx;
+            while (start > 0 && list[start - 1].Section == list[idx].Section) start--;
+            int target;
+            if (dir < 0)
+            {
+                target = start;
+                if (idx == start)
+                {
+                    if (start == 0) target = -1;
+                    else
+                    {
+                        target = start - 1;
+                        while (target > 0 && list[target - 1].Section == list[start - 1].Section) target--;
+                    }
+                }
+            }
+            else
+            {
+                target = idx;
+                while (target < list.Count && list[target].Section == list[idx].Section) target++;
+                if (target >= list.Count) target = -1;
+            }
+            if (target < 0)
+            {
+                // No section further that way: say so and stay.
+                var cur = list[idx];
+                Speech.SayFocus((dir < 0 ? Strings.StartOfList : Strings.EndOfList) + " " + cur.Summary());
+                FocusSideEffects(cur);
+                return;
+            }
+            var e = list[target];
+            _groupFocus[_group] = e.Key;
+            string text = e.Summary();
+            if (e.Section != null) text = Strings.GroupAnnounce(e.Section, list.Count(x => x.Section == e.Section)) + ". " + text;
+            Speech.SayFocus(text);
+            FocusSideEffects(e);
+        }
+
         private void SwitchGroup(int dir)
         {
             _group = (_group + dir + 3) % 3;
             var list = BuildGroup(_group);
             var e = FindFocused(list, _groupFocus[_group]);
             if (e != null) _groupFocus[_group] = e.Key;
-            string text = Strings.GroupAnnounce(GroupName(_group), list.Count) + ". " + (e != null ? e.Summary() : EmptyGroupText(_group));
+            string text = Strings.GroupAnnounce(GroupName(_group), list.Count) + ". "
+                + (e == null ? EmptyGroupText(_group) : (e.Section != null ? e.Section + ". " : "") + e.Summary());
             Speech.SayFocus(text);
             FocusSideEffects(e);
         }

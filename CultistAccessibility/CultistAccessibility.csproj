@@ -9,7 +9,7 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <!-- The game is 32-bit; the plugin itself is AnyCPU managed code. -->
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>portable</DebugType>

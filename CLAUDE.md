@@ -68,6 +68,7 @@ Navigation/                  generic uGUI navigator (menus, overlays, options, l
 Tabletop/
   TabletopNavigator          Board (Verbs / Cards / Controls), verb Window, Mansus, modal Pickers
   Describer                  spoken summaries and detail lines for cards, verbs, slots, aspects, deck draws
+  CardSections               Cards-list sections by kind (first matching aspect rule; Page Up/Down, Table buffer)
   GameActions                all state changes, through the game's own code paths
   GameAccess                 read-only game state helpers
   TabletopEvents             4 Hz poll: verb start/continue/complete/appear/vanish, danger countdowns
@@ -157,6 +158,10 @@ SpeechHost/                  x64 Prism host process
   the saved one matches neither the title nor the text; `TextSpec` takes slot texts from the verb/recipe spec with
   the same id. Entities are looked up again by id (`CurrentEntity`): the game reloads the Compendium on a language
   change. The character's `Profession` is also saved text and is not relocalised.
+- The build takes `prism.dll` from the shared `C:\Users\Nitropc\code\libs\prism` (csproj `PrismDir`), so updating
+  Prism there changes the next build. `SpeechHost/PrismNative.cs` mirrors `PrismConfig` by hand: when prism.h
+  changes it (0.18 added `availability_baseline_callback`), a stale mirror crashes the host on every start, and the
+  plugin's restarts show up as ~1 s speech lag. The host only passes its config to Prism 0.18.x.
 - Build with `build.ps1` (closes the game, `--no-incremental`, verifies the deployed timestamp); a running game locks
   the deployed files.
 

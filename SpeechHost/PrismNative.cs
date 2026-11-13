@@ -20,7 +20,13 @@ namespace CultistAccessibility.SpeechHost
         public const ulong FEATURE_SUPPORTS_OUTPUT = 1UL << 5;
         public const ulong FEATURE_SUPPORTS_STOP = 1UL << 7;
 
-        /// <summary>Mirror of PrismConfig (version 3). Blittable; default packing matches the C layout on x64.</summary>
+        /// <summary>
+        /// Mirror of PrismConfig (PRISM_CONFIG_VERSION 4, Prism 0.18). Blittable; default packing matches the C layout
+        /// on x64. Must match prism.h exactly: prism_config_init returns it by value, so a shorter mirror is a buffer
+        /// overrun, and prism_init calls the trailing fields as function pointers (version 4 added the baseline
+        /// callback; without it the host crashed on every start). Program.InitContext only uses it with
+        /// <see cref="SupportedVersionPrefix"/>.
+        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
         public struct PrismConfig
         {
@@ -32,7 +38,11 @@ namespace CultistAccessibility.SpeechHost
             public uint availability_debounce_samples;
             public uint availability_backoff_max_ms;
             public byte availability_auto_power_manage;
+            public IntPtr availability_baseline_callback;
         }
+
+        /// <summary>Prism versions whose PrismConfig layout matches the struct above.</summary>
+        public const string SupportedVersionPrefix = "0.18.";
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void AvailabilityCallback(IntPtr userdata, ulong backend, IntPtr name, [MarshalAs(UnmanagedType.I1)] bool available);

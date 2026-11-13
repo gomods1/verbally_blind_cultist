@@ -106,9 +106,16 @@ namespace CultistAccessibility.Tabletop
         public static List<string> TableLines()
         {
             if (!GameAccess.TableReady) return null;
-            return GameAccess.TableCards()
-                .OrderBy(t => Describer.CardName(t), StringComparer.CurrentCultureIgnoreCase)
-                .Select(Describer.CardSummary).ToList();
+            // Same order as the Cards list, each section's name on the line before its first card.
+            var lines = new List<string>();
+            int section = -1;
+            foreach (var kv in CardSections.Sorted(GameAccess.TableCards()))
+            {
+                if (kv.Value != section) lines.Add(CardSections.Name(kv.Value) + ":");
+                section = kv.Value;
+                lines.Add(Describer.CardSummary(kv.Key));
+            }
+            return lines;
         }
 
         public static List<string> StatusLines()
