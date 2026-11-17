@@ -51,6 +51,31 @@ namespace CultistAccessibility.Tabletop
             return TextCleaner.Join(parts.ToArray());
         }
 
+        // Aspects of the expedition obstacles (content/core/elements/vault_locks.json).
+        private static readonly string[] ObstacleAspects = { "peril", "guardian", "curse", "seal" };
+
+        /// <summary>An expedition obstacle (peril, guardian, curse or seal) in an Explore verb.</summary>
+        public static bool IsObstacle(Token token)
+        {
+            try
+            {
+                if (token == null || token.Defunct || token.Payload.IsShrouded) return false;
+                var aspects = token.Payload.GetAspects(false);
+                return ObstacleAspects.Any(a => aspects.ContainsKey(a));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>"Obstacle: Watchers. They can be fought, seduced, or deceived.": the name and what overcomes it.</summary>
+        public static string ObstacleSummary(Token token)
+        {
+            var p = token.Payload;
+            return TextCleaner.Sentences(new[] { Strings.Obstacle(CardSummary(token)), TextCleaner.Clean(p.Description) });
+        }
+
         public static List<string> CardDetails(Token token)
         {
             var lines = new List<string>();
@@ -170,13 +195,17 @@ namespace CultistAccessibility.Tabletop
             var spec = TextSpec(slot);
             if (spec == null) return Strings.SlotWord;
             string label = TextCleaner.Clean(spec.Label);
-            if (string.IsNullOrEmpty(label)) label = TextCleaner.Clean(spec.Id);
+            // Some game slots have no label (the game shows none); their id is English, so name them by what they take.
+            if (string.IsNullOrEmpty(label)) label = AspectList(spec.Required);
+            if (string.IsNullOrEmpty(label)) label = AspectList(spec.Essential);
+            if (string.IsNullOrEmpty(label)) label = Strings.SlotWord;
             return label;
         }
 
         /// <summary>
         /// The slot's spec for its label and description. A slot's spec is saved with the game, texts included, in
-        /// the language of the time; the verb's or recipe's slot with the same id gives the current language.
+        /// the language of the time; the verb's, recipe's or card's slot with the same id gives the current language
+        /// (cards bring slots of their own into a verb: an expedition's Leader and Funds, a rite's Invocation).
         /// </summary>
         private static SphereSpec TextSpec(Sphere slot)
         {
@@ -191,6 +220,13 @@ namespace CultistAccessibility.Tabletop
                 foreach (var r in new[] { CurrentEntity(s.CurrentRecipe), CurrentEntity(s.FallbackRecipe) })
                     if (r?.Slots != null) candidates.AddRange(r.Slots);
                 if (verb?.Thresholds != null) candidates.InsertRange(s.StateIdentifier == StateEnum.Unstarted ? 0 : candidates.Count, verb.Thresholds);
+                foreach (var threshold in GameAccess.ActiveThresholds(s))
+                    foreach (var t in threshold.GetElementTokens())
+                    {
+                        var element = (t.Payload as ElementStack)?.Element;
+                        var current = element != null ? CurrentEntity(element) : null;
+                        if (current?.Slots != null) candidates.AddRange(current.Slots);
+                    }
                 return candidates.FirstOrDefault(c => c != null && c.Id == spec.Id) ?? spec;
             }
             catch
@@ -488,8 +524,8 @@ namespace CultistAccessibility.Tabletop
             if (!string.IsNullOrEmpty(recipe) && recipe != VerbName(s)) lines.Add(Strings.Recipe + ": " + recipe);
             if (text != verbDesc) lines.AddRange(TextCleaner.SplitIntoSpeechItems(text));
             foreach (var slot in GameAccess.ActiveThresholds(s)) lines.Add(SlotSummary(slot));
-            foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage)))
-                lines.Add(Strings.StoredHeading + ": " + CardSummary(card));
+            foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage)).OrderBy(t => IsObstacle(t) ? 0 : 1))
+                lines.Add(IsObstacle(card) ? ObstacleSummary(card) : Strings.StoredHeading + ": " + CardSummary(card));
             foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Output)))
                 lines.Add(Strings.OutputHeading + ": " + CardSummary(card));
             string deck = DeckEffects(s);

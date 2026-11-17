@@ -664,6 +664,7 @@ namespace CultistAccessibility.Tabletop
                 var e = FindFocused(BuildGroup(_group), _groupFocus[_group]);
                 Speech.Say(e != null ? e.Summary() : EmptyGroupText(_group));
             }
+            else if (SectionKey() is int number) AssignSection(number);
             else if (KeyInput.Hotkey(ModConfig.KeyReadScreen.Value))
             {
                 var list = BuildGroup(_group);
@@ -672,6 +673,61 @@ namespace CultistAccessibility.Tabletop
                     .GroupBy(x => x.Section)
                     .SelectMany(g => (g.Key != null ? new[] { g.Key + ":" } : new string[0]).Concat(g.Select(x => x.Summary())))));
             }
+        }
+
+        private static readonly Key[] DigitKeys =
+        {
+            Key.Digit0, Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9
+        };
+
+        private static readonly Key[] NumpadKeys =
+        {
+            Key.Numpad0, Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9
+        };
+
+        /// <summary>The number key pressed this frame (0 to 9), if any.</summary>
+        private static int? SectionKey()
+        {
+            for (int i = 0; i < DigitKeys.Length; i++)
+                if (KeyInput.Hotkey(DigitKeys[i]) || KeyInput.Hotkey(NumpadKeys[i])) return i;
+            return null;
+        }
+
+        /// <summary>
+        /// 1 to 9 on a table card puts every card of that kind (same id, same name) in the player's numbered section;
+        /// 0 gives it back to its automatic section. Focus stays on the card, which moves with its section.
+        /// </summary>
+        private void AssignSection(int number)
+        {
+            if (_group != GroupCards)
+            {
+                Speech.Say(Strings.SectionNeedsCard);
+                return;
+            }
+            var e = FindFocused(BuildCards(), _groupFocus[GroupCards]);
+            var card = e?.Token;
+            if (card == null || card.Defunct)
+            {
+                Speech.Say(Strings.SectionNeedsCard);
+                return;
+            }
+            if (card.Payload.IsShrouded)
+            {
+                Speech.Say(Strings.SectionFaceDownRefused);
+                return;
+            }
+            string id = card.Payload.EntityId;
+            string name = Describer.CardName(card);
+            int current = CardSections.CustomSectionOf(id);
+            if (number == current)
+            {
+                Speech.Say(number == 0 ? Strings.SectionAlreadyAutomatic(name, CardSections.AutomaticName(card))
+                    : Strings.SectionAlreadyIn(name, Strings.SectionCustom(number)));
+                return;
+            }
+            CardSections.Assign(id, number);
+            string section = number == 0 ? CardSections.AutomaticName(card) : Strings.SectionCustom(number);
+            Speech.Say(Strings.SectionMoved(name, section));
         }
 
         private void MoveBoard(int dir, bool toEnd = false)
@@ -926,13 +982,15 @@ namespace CultistAccessibility.Tabletop
                     break;
                 case StateEnum.Ongoing:
                 case StateEnum.Starting:
-                    foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage)))
+                    // Expedition obstacles first, with what overcomes them, as the game shows them in the window.
+                    foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage))
+                        .OrderBy(t => Describer.IsObstacle(t) ? 0 : 1))
                     {
                         var c = card;
                         list.Add(new NavEntry
                         {
                             Key = c,
-                            Summary = () => Strings.StoredHeading + ": " + Describer.CardSummary(c),
+                            Summary = () => Describer.IsObstacle(c) ? Describer.ObstacleSummary(c) : Strings.StoredHeading + ": " + Describer.CardSummary(c),
                             Details = () => Describer.CardDetails(c),
                             Activate = () => Inspect(new NavEntry { Summary = () => Describer.CardSummary(c), Details = () => Describer.CardDetails(c) })
                         });
@@ -1190,32 +1248,67 @@ namespace CultistAccessibility.Tabletop
             return null;
         }
 
+        private sealed class MansusPlace
+        {
+            public Sphere Sphere;
+            public string Name;
+            public string Position;
+        }
+
+        /// <summary>
+        /// The places of the open Way, left to right as on screen. Each output sphere of a Way is a place with its own
+        /// deck (portals/mansusportals.json: consequence "topath" = sphere id such as "wood1"). The game shows place
+        /// names only in the map artwork; the mod names them (Lang: Mansus.&lt;sphere id&gt;, as in the game's dream
+        /// texts and the wiki). The middle place shares the Way's name and its card is dealt face up.
+        /// </summary>
+        private List<MansusPlace> MansusPlaces(Otherworld ow)
+        {
+            var places = new List<MansusPlace>();
+            if (ow == null) return places;
+            // Positions count every place of the open Way, also those already emptied by a choice.
+            var egress = ActiveEgress(ow);
+            var dominions = ow.Dominions.OfType<OtherworldDominion>().ToList();
+            var open = dominions.Where(d => egress != null && d.EgressSphere == egress).ToList();
+            if (open.Count == 0) open = dominions.Where(d => d.Spheres.Any(sp => sp != null && !sp.Defunct && sp.GetElementTokens().Any())).ToList();
+            foreach (var d in open)
+                foreach (var sphere in d.Spheres)
+                {
+                    if (sphere == null || sphere.Defunct || sphere == d.EgressSphere) continue;
+                    if (sphere.SphereCategory != SphereCategory.Output) continue;
+                    places.Add(new MansusPlace { Sphere = sphere });
+                }
+            try { places = places.OrderBy(p => p.Sphere.transform.position.x).ToList(); }
+            catch { }
+            for (int i = 0; i < places.Count; i++)
+            {
+                var p = places[i];
+                p.Name = MansusLocation(p.Sphere, i + 1);
+                if (places.Count == 3) p.Position = i == 0 ? Strings.PlaceLeft : i == 1 ? Strings.PlaceCentre : Strings.PlaceRight;
+                else if (places.Count == 2) p.Position = i == 0 ? Strings.PlaceLeft : Strings.PlaceRight;
+            }
+            return places;
+        }
+
         private List<NavEntry> BuildMansus()
         {
             var list = new List<NavEntry>();
             var ow = CurrentOtherworld();
             if (ow == null) return list;
             var egress = ActiveEgress(ow);
-            foreach (var d in ow.Dominions.OfType<OtherworldDominion>())
+            foreach (var place in MansusPlaces(ow))
             {
-                int place = 0;
-                foreach (var sphere in d.Spheres)
+                var p = place;
+                string where = string.IsNullOrEmpty(p.Position) ? p.Name : Strings.MansusPlace(p.Name, p.Position);
+                foreach (var t in p.Sphere.GetElementTokens())
                 {
-                    if (sphere == null || sphere.Defunct || sphere == d.EgressSphere) continue;
-                    if (sphere.SphereCategory != SphereCategory.Output) continue;
-                    place++;
-                    foreach (var t in sphere.GetElementTokens())
+                    var card = t;
+                    list.Add(new NavEntry
                     {
-                        var card = t;
-                        string where = MansusLocation(sphere, place);
-                        list.Add(new NavEntry
-                        {
-                            Key = card,
-                            Summary = () => where + ": " + (card.Payload.IsShrouded ? Strings.FaceDown : Describer.CardSummary(card)),
-                            Details = () => Describer.CardDetails(card),
-                            Activate = () => ChooseInMansus(card, egress)
-                        });
-                    }
+                        Key = card,
+                        Summary = () => where + ": " + (card.Payload.IsShrouded ? Strings.FaceDown : Describer.CardSummary(card)),
+                        Details = () => MansusDetails(ow, p, card),
+                        Activate = () => ChooseInMansus(card, egress)
+                    });
                 }
             }
             return list;
@@ -1223,9 +1316,67 @@ namespace CultistAccessibility.Tabletop
 
         private static string MansusLocation(Sphere sphere, int n)
         {
+            string key = "Mansus." + sphere.Id;
+            if (!string.IsNullOrEmpty(sphere.Id) && Loc.Has(key)) return Loc.Get(key);
             string label = TextCleaner.Clean(sphere.GoverningSphereSpec?.Label);
             if (!string.IsNullOrEmpty(label)) return label;
             return Strings.MansusChoice(n);
+        }
+
+        private static SecretHistories.Tokens.Payloads.Ingress ActiveIngress(Otherworld ow)
+        {
+            try { return ow != null ? Traverse.Create(ow).Field("_activeIngress").GetValue() as SecretHistories.Tokens.Payloads.Ingress : null; }
+            catch { return null; }
+        }
+
+        /// <summary>I on a Mansus card: the place, the card if it is face up, and every card the place's deck holds.</summary>
+        private static List<string> MansusDetails(Otherworld ow, MansusPlace place, Token card)
+        {
+            string where = string.IsNullOrEmpty(place.Position) ? place.Name : Strings.MansusPlace(place.Name, place.Position);
+            var lines = new List<string>();
+            if (card.Payload.IsShrouded) lines.Add(where + ": " + Strings.FaceDown);
+            else
+            {
+                lines.Add(where + ":");
+                lines.AddRange(Describer.CardDetails(card));
+            }
+            var found = MansusDeckCards(ow, place.Sphere);
+            if (found.Count > 0) lines.Add(Strings.MansusPlaceGives(string.Join(", ", found.ToArray())));
+            return lines;
+        }
+
+        /// <summary>Labels of the cards in the deck the active Way deals into this place (its consequence's deck effects).</summary>
+        private static List<string> MansusDeckCards(Otherworld ow, Sphere sphere)
+        {
+            var labels = new List<string>();
+            try
+            {
+                var ingress = ActiveIngress(ow);
+                if (ingress == null) return labels;
+                var comp = GameAccess.Compendium;
+                foreach (var consequence in ingress.GetConsequences())
+                {
+                    if (consequence.ToPath.GetEndingPathPart().TrimSpherePrefix() != sphere.Id) continue;
+                    var recipe = comp.GetEntityById<Recipe>(consequence.Id);
+                    if (recipe?.DeckEffects == null) continue;
+                    foreach (var deckId in recipe.DeckEffects.Keys)
+                    {
+                        var deck = comp.GetEntityById<DeckSpec>(deckId);
+                        if (deck?.Spec == null) continue;
+                        foreach (var id in deck.Spec)
+                        {
+                            var element = comp.GetEntityById<Element>(id);
+                            string label = TextCleaner.Clean(element?.Label);
+                            if (!string.IsNullOrEmpty(label) && !labels.Contains(label)) labels.Add(label);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.LogDebug("Mansus deck lookup failed: " + ex.Message);
+            }
+            return labels;
         }
 
         private void ChooseInMansus(Token card, Sphere egress)
@@ -1251,8 +1402,7 @@ namespace CultistAccessibility.Tabletop
             string where = "";
             try
             {
-                var ow = CurrentOtherworld();
-                var ingress = ow != null ? Traverse.Create(ow).Field("_activeIngress").GetValue() as SecretHistories.Tokens.Payloads.Ingress : null;
+                var ingress = ActiveIngress(CurrentOtherworld());
                 if (ingress != null) where = TextCleaner.Clean(ingress.Label);
             }
             catch { }

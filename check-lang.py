@@ -62,7 +62,7 @@ for key in sorted(used):
     if key.endswith('.') or key in en:
         continue
     print('en.txt: missing %s (used by Strings.cs)' % key); errors += 1
-claimed = used | {k for k in en if k.startswith(('Help.', 'Key.', 'Screen.', 'Verbosity.'))} | {'DecimalSeparator'}
+claimed = used | {k for k in en if k.startswith(('Help.', 'Key.', 'Screen.', 'Verbosity.', 'Mansus.'))} | {'DecimalSeparator'}
 for key in sorted(set(en) - claimed):
     print('en.txt: %s is not used by the code' % key); errors += 1
 

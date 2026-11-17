@@ -117,6 +117,12 @@ namespace CultistAccessibility.Core
         public static string SectionReputation => T();
         public static string SectionOther => T();
         public static string SectionFaceDown => T();
+        public static string SectionCustom(int n) => F(nameof(SectionCustom), n);
+        public static string SectionNeedsCard => T();
+        public static string SectionFaceDownRefused => T();
+        public static string SectionAlreadyIn(string card, string section) => F(nameof(SectionAlreadyIn), card, section);
+        public static string SectionAlreadyAutomatic(string card, string section) => F(nameof(SectionAlreadyAutomatic), card, section);
+        public static string SectionMoved(string card, string section) => F(nameof(SectionMoved), card, section);
         public static string VerbCount(int n) => Loc.Plural(nameof(VerbCount), n);
         public static string CardCount(int n) => Loc.Plural(nameof(CardCount), n);
         public static string BusyCount(int n) => Loc.Plural(nameof(BusyCount), n);
@@ -150,6 +156,7 @@ namespace CultistAccessibility.Core
         public static string CollectAll => T();
         public static string OutputHeading => T();
         public static string StoredHeading => T();
+        public static string Obstacle(string card) => F(nameof(Obstacle), card);
         public static string PageOf(int i, int n) => F(nameof(PageOf), i, n);
         public static string NoMorePages => T();
         public static string VerbStarted(string verb, string recipe, string time) => WithTime(F(nameof(VerbStarted), verb, recipe), time);
@@ -225,6 +232,11 @@ namespace CultistAccessibility.Core
         public static string MansusLeft => T();
         public static string MansusNoCards => T();
         public static string MansusChoice(int n) => F(nameof(MansusChoice), n);
+        public static string MansusPlace(string place, string position) => F(nameof(MansusPlace), place, position);
+        public static string MansusPlaceGives(string cards) => F(nameof(MansusPlaceGives), cards);
+        public static string PlaceLeft => T();
+        public static string PlaceCentre => T();
+        public static string PlaceRight => T();
 
         public static string PortalSummary(string label, int cards) =>
             F(nameof(PortalSummary), label) + (cards > 0 ? ", " + CardsWaiting(cards) : "");

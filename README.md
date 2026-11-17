@@ -58,6 +58,8 @@ On the table:
 | Enter on a verb | Open its window |
 | Enter on a card | List the verbs that can take it; Enter puts the card in |
 | Page Down / Page Up | In Cards: next section; start of this section, or the previous one |
+| 1 to 9 on a card | Put this card, and every card with the same name, in your own section with that number |
+| 0 on a card | Give it back to its automatic section |
 | H | Your character and the status bar: health, passion, reason, funds and the game speed |
 | T | Game speed, every busy verb with its time left (soonest first), finished verbs, decaying cards |
 | G | Jump to the next verb with results waiting |
@@ -67,6 +69,13 @@ assets, Ill health, Influences, Followers, People, Lore, Books, Tools, Ingredien
 Reputation, Other cards, then Face down. Only sections that have cards appear. The section's name and card count are
 read when focus enters it; inside a section cards are alphabetical, and a stack is one entry with its count.
 A reads the whole group section by section, and the Table buffer lists the cards in the same order.
+
+You can also sort cards yourself. Press a number from 1 to 9 on a card: that card, and every card with the same name,
+moves to your section with that number (Section 1, Section 2...), and your sections come first in the Cards group.
+Cards of that name that arrive later join the same section. 0 gives the card back to its automatic section. Your
+choices are kept in `CultistAccessibility_sections.txt` next to the mod and apply to every game. A face-down card
+has to be turned over first. The number keys replace the game's 1, 2 and 3 zoom levels, which change nothing you can
+hear.
 
 A short beep when focus lands on a card means Enter can use it: a verb would take it now, or it is face down and
 turns over. In a verb window the beep marks a slot that a card on the table fits (or that holds a card you can take
@@ -85,7 +94,13 @@ In a verb window:
 | Page Up / Page Down | Turn the pages of a long story (also Left / Right on the story line) |
 | Escape | Close the window |
 
+During an expedition, the obstacles inside the Explore window come first, read as "Obstacle:" with what overcomes
+them (for example Watchers: they can be fought, seduced, or deceived). I on the Explore verb lists them as well.
+
 In the Mansus: Up / Down move between the places, Enter turns a face-down card over, Enter again takes it back.
+Each place is named, with its position, as on the map: the middle place shares the name of the Way and its card is
+face up (The Wood, centre), the places on the left and right hide theirs (The Well, The Temple of the Wheel). Each
+place has its own small deck: I lists every card that place can give, so you can choose where to dream.
 The card then waits in the portal, listed with the verbs: Enter on the portal to read what you remember and take the
 card.
 
@@ -99,7 +114,7 @@ Verbs starting, continuing, finishing (with how many cards are waiting), appeari
 that opens a slot and wants a card (the slot is also named when you focus the verb and in the T readout), and what
 the verb will become when you put a card there; a warning when a dangerous countdown is about to run out; cards that decay, change or vanish on the table; cards that arrive on the
 table; greedy slots taking cards; the game's pop-up messages; pause and speed changes; the Mansus. Everything
-announced is also kept in the Events review buffer, and the story texts of finished verbs in the Story buffer.
+announced, except pause and speed changes, is also kept in the Events review buffer, and the story texts of finished verbs in the Story buffer.
 The events are also written to `CultistAccessibility_events.log` next to the mod, which helps with bug reports.
 
 ## Languages

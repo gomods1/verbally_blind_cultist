@@ -9,14 +9,14 @@ namespace CultistAccessibility.Patches
     /// Suppression of the game's own key handlers when the mod claims the key.
     /// UIController (tabletop) and MenuScreenController receive Input System action callbacks via
     /// KeyboundGameEvent UnityEvents; a prefix returning false skips the game's handling.
-    /// Arrow keys (camera truck/pedestal) belong to the mod's navigation; everything else is blocked only
-    /// while a mod modal (help, picker) is open.
+    /// Arrow keys (camera truck/pedestal) and the zoom levels on 1/2/3 belong to the mod (navigation and card
+    /// sections); everything else is blocked only while a mod modal (help, picker) is open.
     /// </summary>
     internal static class InputBlockPatches
     {
         private static readonly string[] HotkeyHandlers =
         {
-            "Input_Zoom_Key", "Input_ZoomClose", "Input_ZoomMid", "Input_ZoomFar", "Input_Pause",
+            "Input_Zoom_Key", "Input_Pause",
             "Input_NormalSpeed", "Input_FastSpeed", "Input_Slower", "Input_Faster", "Input_GroupAllStacks",
             "Input_StartRecipe", "Input_NextComplete", "Input_CollectAll", "Input_Abort"
         };
@@ -27,6 +27,9 @@ namespace CultistAccessibility.Patches
             const string ui = "SecretHistories.Infrastructure.UIController";
             PatchRegistry.Patch(harmony, typeof(InputBlockPatches), ui, "Input_Truck_Key", ctx, prefix: nameof(CameraPrefix));
             PatchRegistry.Patch(harmony, typeof(InputBlockPatches), ui, "Input_Pedestal_Key", ctx, prefix: nameof(CameraPrefix));
+            // The number keys put table cards in the player's sections; the zoom levels mean nothing without sight.
+            foreach (var name in new[] { "Input_ZoomClose", "Input_ZoomMid", "Input_ZoomFar" })
+                PatchRegistry.Patch(harmony, typeof(InputBlockPatches), ui, name, ctx, prefix: nameof(CameraPrefix));
             foreach (var name in HotkeyHandlers)
                 PatchRegistry.Patch(harmony, typeof(InputBlockPatches), ui, name, ctx, prefix: nameof(HotkeyPrefix));
             PatchRegistry.Patch(harmony, typeof(InputBlockPatches), "SecretHistories.Infrastructure.MenuScreenController", "OnAbort", Type.EmptyTypes, prefix: nameof(HotkeyPrefix));

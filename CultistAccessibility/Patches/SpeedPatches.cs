@@ -44,7 +44,8 @@ namespace CultistAccessibility.Patches
                 GameSpeed now = __instance.GetEffectiveGameSpeed();
                 if (now == __state) return;
                 string name = StatusReader.SpeedName(now);
-                if (!string.IsNullOrEmpty(name)) Speech.SayEvent(name);
+                // Spoken only: the Events buffer and log are for things the player did not just do.
+                if (!string.IsNullOrEmpty(name)) Speech.Say(name);
             }
             catch (Exception ex)
             {

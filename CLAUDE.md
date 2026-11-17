@@ -34,13 +34,14 @@ kbpedestalup/down), Escape close window / open options (kbabort). Mouse wheel zo
 
 ### Mod keys
 Arrows, Enter, Home/End, Page Up/Down, Delete/Backspace (navigation, owned by the mod); F1 help; F2 verbosity;
-R repeat; I inspect; A read screen/group; H status; T timers; G next completed verb; Ctrl+arrows review buffers;
+R repeat; I inspect; A read screen/group; H status; T timers; G next completed verb; 0-9 on a table card: the
+player's card sections (saved in CultistAccessibility_sections.txt next to the dll); Ctrl+arrows review buffers;
 Ctrl+Shift+D debug dump (DebugLogging). Developer test keys (config DeveloperTestKeys, default false):
 Ctrl+Shift+F5 Contentment card, F6 Despair countdown, F7 save now, F9 Mansus portal, F10 basic cards, F11 ending
 (unlocks a real achievement, see Pitfalls); any screen: Ctrl+Shift+F4 game notification, F3 menu save messages
 (cycles the four combinations the game shows) or the table's save error window, F8 (menu) the error scene S7UhO.
-Letters were chosen to avoid N M S C Q E and digits. The arrow keys'
-camera handlers are suppressed; everything else of the game is suppressed only while a mod modal is open.
+Letters were chosen to avoid N M S C Q E. The arrow keys' camera handlers and the 1/2/3 zoom levels are
+suppressed; everything else of the game is suppressed only while a mod modal is open.
 
 ## Architecture
 
@@ -68,7 +69,8 @@ Navigation/                  generic uGUI navigator (menus, overlays, options, l
 Tabletop/
   TabletopNavigator          Board (Verbs / Cards / Controls), verb Window, Mansus, modal Pickers
   Describer                  spoken summaries and detail lines for cards, verbs, slots, aspects, deck draws
-  CardSections               Cards-list sections by kind (first matching aspect rule; Page Up/Down, Table buffer)
+  CardSections               Cards-list sections: the player's (keys 1-9, by element id), then by kind (first
+                             matching aspect rule); Page Up/Down, Table buffer
   GameActions                all state changes, through the game's own code paths
   GameAccess                 read-only game state helpers
   TabletopEvents             4 Hz poll: verb start/continue/complete/appear/vanish, danger countdowns
@@ -117,7 +119,12 @@ SpeechHost/                  x64 Prism host process
 - Game key callbacks run before our Update; `InputGate` flags describe previous frames, so the Escape that closes a mod
   modal is still blocked from the game.
 - Output/face-down cards: never say their name before they are turned over (sighted players cannot see it either).
-- Mansus place names exist only in the map artwork; no text source exists, so choices are numbered.
+- Mansus place names exist only in the map artwork. The places are output spheres whose id is the portal
+  consequence's `topath` (`wood0`..`peacockdoor2`, portals/mansusportals.json); the mod names them from
+  `Lang: Mansus.<sphere id>` (names from the game's own dream texts per language and the wiki), orders them by
+  screen x for left/centre/right, and lists each place's deck from the consequence recipe's `deckeffects`.
+- Some game slots have no label (Health, HQ rooms, research Reason/Erudition...); the game shows none and their id
+  is English, so `Describer.SlotLabel` names them by their required aspects.
 - `Ending.DefaultEnding()` has null achievements and crashes the game's chronicler; the dev ending key uses
   `deathofthebody`.
 - F12 is Steam's screenshot key and never reaches the game.
