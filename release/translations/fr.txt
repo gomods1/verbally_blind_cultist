@@ -232,10 +232,10 @@ Minutes.other = {0} minutes
 MinutesAndSeconds = {0} {1}
 
 # The Mansus
-MansusEntered = Vous entrez dans le Mansus : {0}. Choisissez une carte face cachée.
-MansusChooseHint = Appuyez sur Entrée sur une carte face cachée pour la retourner, puis encore sur Entrée pour l'emporter.
+MansusEntered = Vous entrez dans la Manse : {0}. Choisissez une carte.
+MansusChooseHint = Appuyez sur Entrée sur une carte pour la choisir. Une carte face cachée est d'abord retournée : appuyez encore sur Entrée pour l'emporter.
 MansusRevealed = Retournée : {0}. Appuyez encore sur Entrée pour l'emporter.
-MansusLeft = Vous quittez le Mansus.
+MansusLeft = Vous quittez la Manse.
 MansusNoCards = Aucune carte à choisir ici pour l'instant.
 MansusChoice = Choix {0}
 MansusPlace = {0}, {1}
@@ -330,9 +330,9 @@ Help.Window.6 = Entrée sur le texte de l'histoire le lit en entier. Page préc�
 Help.Window.7 = Échap ferme la fenêtre ; les cartes laissées dans les emplacements d'un verbe non commencé reviennent sur la table.
 Help.Window.8 = Un bip court sur un emplacement signifie qu'une carte de la table lui convient, ou qu'il contient une carte que vous pouvez retirer ; sur Commencer, que la recette démarrera.
 
-Help.Mansus.Title = Le Mansus
-Help.Mansus.1 = Vous rêvez dans le Mansus. Des cartes face cachée attendent aux endroits que vous pouvez atteindre.
-Help.Mansus.2 = Les flèches haut et bas passent de l'une à l'autre. Entrée retourne une carte ; les autres s'effacent.
+Help.Mansus.Title = La Manse
+Help.Mansus.1 = Vous rêvez dans la Manse. Des cartes, face cachée pour la plupart, attendent aux endroits que vous pouvez atteindre.
+Help.Mansus.2 = Les flèches haut et bas passent de l'une à l'autre. Entrée sur une carte face visible l'emporte aussitôt ; Entrée sur une carte face cachée la retourne, et les autres s'effacent.
 Help.Mansus.3 = Entrée de nouveau emporte la carte révélée et le rêve prend fin.
 Help.Mansus.4 = Chaque carte attend en un lieu nommé de la Voie, lu avec sa position : le lieu du milieu porte le nom de la Voie et montre sa carte face visible, les lieux de gauche et de droite cachent la leur. Chaque lieu a son propre paquet : {2} liste les cartes qu'il peut donner.
 

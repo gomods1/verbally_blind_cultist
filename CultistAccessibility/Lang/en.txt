@@ -251,8 +251,8 @@ Minutes.other = {0} minutes
 MinutesAndSeconds = {0} {1}
 
 # The Mansus
-MansusEntered = You enter the Mansus: {0}. Choose one face-down card.
-MansusChooseHint = Press Enter on a face-down card to turn it over, then Enter again to take it back with you.
+MansusEntered = You enter the Mansus: {0}. Choose one card.
+MansusChooseHint = Press Enter on a card to choose it. A face-down card is turned over first: press Enter again to take it back with you.
 MansusRevealed = Turned over: {0}. Press Enter again to take it back.
 MansusLeft = You leave the Mansus.
 MansusNoCards = No cards to choose here yet.
@@ -350,8 +350,8 @@ Help.Window.7 = Escape closes the window; cards left in slots of an unstarted ve
 Help.Window.8 = A short beep on a slot means a card on the table fits it, or it holds a card you can take out; on Start, that the recipe will start.
 
 Help.Mansus.Title = The Mansus
-Help.Mansus.1 = You are dreaming in the Mansus. Face-down cards wait at the places you can reach.
-Help.Mansus.2 = Up and down arrows move between them. Enter turns a card over; the others fade away.
+Help.Mansus.1 = You are dreaming in the Mansus. Cards, most of them face down, wait at the places you can reach.
+Help.Mansus.2 = Up and down arrows move between them. Enter on a face-up card takes it at once; Enter on a face-down card turns it over, and the others fade away.
 Help.Mansus.3 = Enter again takes the revealed card back with you and the dream ends.
 Help.Mansus.4 = Each card waits at a named place of the Way, read with its position: the middle place shares the Way's name and shows its card face up, the places left and right hide theirs. Each place has its own deck: {2} lists the cards it can give.
 

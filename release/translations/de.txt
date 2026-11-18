@@ -232,10 +232,10 @@ Minutes.other = {0} Minuten
 MinutesAndSeconds = {0} {1}
 
 # The Mansus
-MansusEntered = Du betrittst die Mansus: {0}. Wähle eine verdeckte Karte.
-MansusChooseHint = Drücke Eingabe auf einer verdeckten Karte, um sie umzudrehen, und noch einmal Eingabe, um sie mitzunehmen.
+MansusEntered = Du betrittst den Mansus: {0}. Wähle eine Karte.
+MansusChooseHint = Drücke Eingabe auf einer Karte, um sie zu wählen. Eine verdeckte Karte wird zuerst umgedreht: drücke dann noch einmal Eingabe, um sie mitzunehmen.
 MansusRevealed = Umgedreht: {0}. Drücke noch einmal Eingabe, um sie mitzunehmen.
-MansusLeft = Du verlässt die Mansus.
+MansusLeft = Du verlässt den Mansus.
 MansusNoCards = Hier gibt es noch keine Karten zur Auswahl.
 MansusChoice = Auswahl {0}
 MansusPlace = {0}, {1}
@@ -330,9 +330,9 @@ Help.Window.6 = Eingabe auf dem Text der Geschichte liest ihn vollständig. Bild
 Help.Window.7 = Escape schließt das Fenster; Karten, die in den Slots eines nicht gestarteten Verbs liegen, kehren auf den Tisch zurück.
 Help.Window.8 = Ein kurzer Piepton auf einem Slot bedeutet, dass eine Karte vom Tisch hineinpasst oder dass er eine Karte enthält, die du herausnehmen kannst; auf Start, dass das Rezept starten wird.
 
-Help.Mansus.Title = Die Mansus
-Help.Mansus.1 = Du träumst in der Mansus. Verdeckte Karten warten an den Orten, die du erreichen kannst.
-Help.Mansus.2 = Pfeil auf und ab bewegen zwischen ihnen. Eingabe dreht eine Karte um; die anderen verblassen.
+Help.Mansus.Title = Der Mansus
+Help.Mansus.1 = Du träumst im Mansus. Karten, die meisten verdeckt, warten an den Orten, die du erreichen kannst.
+Help.Mansus.2 = Pfeil auf und ab bewegen zwischen ihnen. Eingabe auf einer offenen Karte nimmt sie sofort mit; Eingabe auf einer verdeckten Karte dreht sie um, und die anderen verblassen.
 Help.Mansus.3 = Noch einmal Eingabe nimmt die aufgedeckte Karte mit, und der Traum endet.
 Help.Mansus.4 = Jede Karte wartet an einem benannten Ort des Weges, mit seiner Lage vorgelesen: der mittlere Ort trägt den Namen des Weges und zeigt seine Karte offen, die Orte links und rechts verbergen ihre. Jeder Ort hat seinen eigenen Stapel: {2} nennt die Karten, die er geben kann.
 

@@ -123,6 +123,10 @@ SpeechHost/                  x64 Prism host process
   consequence's `topath` (`wood0`..`peacockdoor2`, portals/mansusportals.json); the mod names them from
   `Lang: Mansus.<sphere id>` (names from the game's own dream texts per language and the wiki), orders them by
   screen x for left/centre/right, and lists each place's deck from the consequence recipe's `deckeffects`.
+- The translations do not all call the Mansus "Mansus": French "la Manse", Spanish "el Dominio", German "der Mansus"
+  (masculine), Russian "Обитель" (opening quote in `core/cultures/<id>/culture.json`). Mod texts use the game's word.
+- Greedy slots grab their card (`GreedyAngel.GrabStack`) as the recipe starts, before the 4 Hz poll sees it: the
+  patch queues the line (`TabletopEvents.QueueGrab`) and the poll speaks it after "continues" and "wants a card".
 - Some game slots have no label (Health, HQ rooms, research Reason/Erudition...); the game shows none and their id
   is English, so `Describer.SlotLabel` names them by their required aspects.
 - `Ending.DefaultEnding()` has null achievements and crashes the game's chronicler; the dev ending key uses

@@ -29,6 +29,24 @@ namespace CultistAccessibility.Tabletop
         }
 
         private readonly Dictionary<Situation, Snapshot> _snaps = new Dictionary<Situation, Snapshot>();
+
+        private sealed class PendingGrab
+        {
+            public Situation Verb;
+            public SecretHistories.Spheres.Sphere Slot;
+            public string Text;
+            public float Deadline;
+        }
+
+        // Greedy slots grabbing cards (CardPatches): the game grabs as the recipe starts, before this poll
+        // announces the verb, its new recipe and the slot, so the grab waits until its slot has been announced.
+        private static readonly List<PendingGrab> PendingGrabs = new List<PendingGrab>();
+        private const float GrabMaxDelay = 1.5f;
+
+        public static void QueueGrab(Situation verb, SecretHistories.Spheres.Sphere slot, string text)
+        {
+            PendingGrabs.Add(new PendingGrab { Verb = verb, Slot = slot, Text = text, Deadline = Time.unscaledTime + GrabMaxDelay });
+        }
         private bool _armed;
         private float _nextPoll;
 
@@ -37,6 +55,7 @@ namespace CultistAccessibility.Tabletop
         public void Reset()
         {
             _snaps.Clear();
+            PendingGrabs.Clear();
             _armed = false;
         }
 
@@ -84,7 +103,9 @@ namespace CultistAccessibility.Tabletop
             {
                 try { Check(s); }
                 catch (Exception ex) { Plugin.LogDebug("Event check failed: " + ex.Message); }
+                FlushGrabs(s);
             }
+            FlushGrabs(null);
 
             var gone = _snaps.Keys.Where(k => !current.Contains(k)).ToList();
             foreach (var s in gone)
@@ -171,6 +192,25 @@ namespace CultistAccessibility.Tabletop
             }
         }
 
+        /// <summary>
+        /// Speaks the grabs of verb s whose slot this poll has announced (or found already filled), in the order they
+        /// happened; with s null, the grabs that waited too long (verb not on the table, slot never listed).
+        /// </summary>
+        private void FlushGrabs(Situation s)
+        {
+            if (PendingGrabs.Count == 0) return;
+            Snapshot snap = null;
+            if (s != null) _snaps.TryGetValue(s, out snap);
+            var ready = PendingGrabs.Where(g => s == null
+                ? Time.unscaledTime >= g.Deadline
+                : g.Verb == s && (g.Slot == null || (snap != null && snap.KnownSlots.Contains(g.Slot)))).ToList();
+            foreach (var g in ready)
+            {
+                PendingGrabs.Remove(g);
+                Speech.SayEvent(g.Text);
+            }
+        }
+
         private static bool IsPrediction(Situation s)
         {
             try { return s.CurrentRecipe != null && s.FallbackRecipe != null && s.CurrentRecipe != s.FallbackRecipe; }
@@ -179,7 +219,7 @@ namespace CultistAccessibility.Tabletop
 
         /// <summary>
         /// A running recipe opened a slot: the game shows a mini slot on the verb token with a sound
-        /// (VerbManifestation.ShowMiniSlot). Greedy slots that already grabbed their card were announced by CardPatches.
+        /// (VerbManifestation.ShowMiniSlot). A greedy slot's grab (CardPatches) is spoken after this line (FlushGrabs).
         /// </summary>
         private static void AnnounceNewSlots(Situation s, Snapshot snap)
         {

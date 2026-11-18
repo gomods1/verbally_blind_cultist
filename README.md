@@ -97,7 +97,7 @@ In a verb window:
 During an expedition, the obstacles inside the Explore window come first, read as "Obstacle:" with what overcomes
 them (for example Watchers: they can be fought, seduced, or deceived). I on the Explore verb lists them as well.
 
-In the Mansus: Up / Down move between the places, Enter turns a face-down card over, Enter again takes it back.
+In the Mansus: Up / Down move between the places. Enter on a face-up card takes it; Enter on a face-down card turns it over, Enter again takes it back.
 Each place is named, with its position, as on the map: the middle place shares the name of the Way and its card is
 face up (The Wood, centre), the places on the left and right hide theirs (The Well, The Temple of the Wheel). Each
 place has its own small deck: I lists every card that place can give, so you can choose where to dream.

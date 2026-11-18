@@ -188,10 +188,12 @@ namespace CultistAccessibility.Patches
                 if (!Armed || !ModConfig.AnnounceGreedyGrabs.Value) return;
                 string card = Describer.CardName(matchingToken);
                 string verb = "";
-                if (____thresholdSphereToGrabTo != null && ____thresholdSphereToGrabTo.GetContainer() is Situation s)
-                    verb = Describer.VerbName(s);
+                var situation = ____thresholdSphereToGrabTo?.GetContainer() as Situation;
+                if (situation != null) verb = Describer.VerbName(situation);
                 if (string.IsNullOrEmpty(verb)) verb = Describer.SlotLabel(____thresholdSphereToGrabTo);
-                Speech.SayEvent(Strings.GreedyGrab(verb, card));
+                // The grab happens as the recipe starts, before the poll announces the verb and its slot:
+                // TabletopEvents speaks it after them.
+                TabletopEvents.QueueGrab(situation, ____thresholdSphereToGrabTo, Strings.GreedyGrab(verb, card));
             }
             catch { }
         }

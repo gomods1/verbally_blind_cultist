@@ -232,10 +232,10 @@ Minutes.other = {0} minutos
 MinutesAndSeconds = {0} {1}
 
 # The Mansus
-MansusEntered = Entras en la Mansus: {0}. Elige una carta boca abajo.
-MansusChooseHint = Pulsa Intro sobre una carta boca abajo para darle la vuelta, y otra vez Intro para llevártela.
+MansusEntered = Entras en el Dominio: {0}. Elige una carta.
+MansusChooseHint = Pulsa Intro sobre una carta para elegirla. A una carta boca abajo primero se le da la vuelta: pulsa Intro otra vez para llevártela.
 MansusRevealed = Descubierta: {0}. Pulsa Intro otra vez para llevártela.
-MansusLeft = Sales de la Mansus.
+MansusLeft = Sales del Dominio.
 MansusNoCards = Todavía no hay cartas para elegir aquí.
 MansusChoice = Opción {0}
 MansusPlace = {0}, {1}
@@ -330,9 +330,9 @@ Help.Window.6 = Intro sobre el texto de la historia lo lee completo. Retroceder 
 Help.Window.7 = Escape cierra la ventana; las cartas que queden en los espacios de un verbo sin iniciar vuelven a la mesa.
 Help.Window.8 = Un pitido corto en un espacio significa que una carta de la mesa encaja en él, o que tiene una carta que puedes sacar; en Iniciar, que la receta empezará.
 
-Help.Mansus.Title = La Mansus
-Help.Mansus.1 = Estás soñando en la Mansus. Hay cartas boca abajo esperando en los lugares a los que puedes llegar.
-Help.Mansus.2 = Las flechas arriba y abajo se mueven entre ellas. Intro da la vuelta a una carta; las demás se desvanecen.
+Help.Mansus.Title = El Dominio
+Help.Mansus.1 = Estás soñando en el Dominio. Hay cartas, casi todas boca abajo, esperando en los lugares a los que puedes llegar.
+Help.Mansus.2 = Las flechas arriba y abajo se mueven entre ellas. Intro sobre una carta boca arriba te la llevas enseguida; Intro sobre una carta boca abajo le da la vuelta, y las demás se desvanecen.
 Help.Mansus.3 = Intro otra vez se lleva contigo la carta descubierta y el sueño termina.
 Help.Mansus.4 = Cada carta espera en un lugar con nombre de la Senda, leído con su posición: el lugar del medio lleva el nombre de la Senda y muestra su carta boca arriba, los lugares de la izquierda y la derecha ocultan la suya. Cada lugar tiene su propio mazo: {2} enumera las cartas que puede dar.
 
