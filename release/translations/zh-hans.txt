@@ -328,6 +328,7 @@ Help.Mansus.4 = 每张卡牌都在该道路上一个有名字的地点等待，�
 Help.Picker.Title = 从列表中选择
 Help.Picker.1 = 上下方向键在选项之间移动，回车键选择，Escape 键取消。
 Help.Picker.2 = {2} 朗读聚焦选项的全部信息。
+Help.Picker.3 = 适合某个卡槽的卡牌按与卡牌分组相同的部分和顺序列出：Page Down 和 Page Up 在各部分之间跳转，{0} 朗读整个列表。
 
 Help.Global.1 = 在任何地方都有效的按键：
 Help.Global.2 = {8} 打开此帮助。{7} 更改朗读的详细程度。

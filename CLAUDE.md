@@ -75,7 +75,8 @@ Tabletop/
   GameAccess                 read-only game state helpers
   TabletopEvents             4 Hz poll: verb start/continue/complete/appear/vanish, danger countdowns
   StatusReader               H and T readouts, refreshers for the Verbs/Table/Status buffers
-  Picker                     modal list (card for a slot, verb for a card, portal contents)
+  Picker                     modal list (card for a slot, verb for a card, portal contents); options may carry a
+                             section: a slot's cards use the Cards-group sections, Page Up/Down, A
   DeveloperTools             test-only keys (config DeveloperTestKeys, default false)
 Patches/                     manual Harmony patches, see PATCH_TARGETS.md
 Help/                        HelpSystem (F1 list) and one context per screen/mode

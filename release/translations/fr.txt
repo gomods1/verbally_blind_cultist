@@ -339,6 +339,7 @@ Help.Mansus.4 = Chaque carte attend en un lieu nommé de la Voie, lu avec sa pos
 Help.Picker.Title = Choix dans une liste
 Help.Picker.1 = Les flèches haut et bas parcourent les choix, Entrée en choisit un, Échap annule.
 Help.Picker.2 = {2} lit tout sur le choix sélectionné.
+Help.Picker.3 = Les cartes qui conviennent à un emplacement sont listées dans les mêmes sections et le même ordre que le groupe Cartes : Page suivante et Page précédente passent d'une section à l'autre, {0} lit toute la liste.
 
 Help.Global.1 = Touches qui fonctionnent partout :
 Help.Global.2 = {8} ouvre cette aide. {7} change la quantité d'informations annoncées.

@@ -358,6 +358,7 @@ Help.Mansus.4 = Each card waits at a named place of the Way, read with its posit
 Help.Picker.Title = Choosing from a list
 Help.Picker.1 = Up and down arrows move through the choices, Enter picks one, Escape cancels.
 Help.Picker.2 = {2} reads everything about the focused choice.
+Help.Picker.3 = The cards that fit a slot are listed in the same sections and order as the Cards group: Page Up and Page Down jump between sections, {0} reads the whole list.
 
 Help.Global.1 = Keys that work everywhere:
 Help.Global.2 = {8} opens this help. {7} changes how much is said.

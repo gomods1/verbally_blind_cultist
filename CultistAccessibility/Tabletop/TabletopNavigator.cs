@@ -859,16 +859,15 @@ namespace CultistAccessibility.Tabletop
                     OnChoose = () => EmptySlotAndReport(slot)
                 });
             }
-            var cards = GameAccess.TableCards()
-                .Where(t => GameActions.CanPlace(t, slot))
-                .OrderBy(t => Describer.CardName(t), StringComparer.CurrentCultureIgnoreCase)
-                .ToList();
-            foreach (var t in cards)
+            // Same sections and order as the Cards group, only the cards the slot accepts.
+            var cards = CardSections.Sorted(GameAccess.TableCards().Where(t => GameActions.CanPlace(t, slot)));
+            foreach (var kv in cards)
             {
-                var card = t;
+                var card = kv.Key;
                 options.Add(new PickerOption
                 {
                     Label = Describer.CardSummary(card),
+                    Section = CardSections.Name(kv.Value),
                     Details = () => Describer.CardDetails(card),
                     OnChoose = () => PlaceAndReport(card, slot, s)
                 });

@@ -339,6 +339,7 @@ Help.Mansus.4 = Cada carta espera en un lugar con nombre de la Senda, leído con
 Help.Picker.Title = Elegir de una lista
 Help.Picker.1 = Las flechas arriba y abajo recorren las opciones, Intro elige una, Escape cancela.
 Help.Picker.2 = {2} lee todo sobre la opción enfocada.
+Help.Picker.3 = Las cartas que encajan en un espacio se listan en las mismas secciones y el mismo orden que el grupo Cartas: Avanzar página y Retroceder página saltan entre secciones, {0} lee toda la lista.
 
 Help.Global.1 = Teclas que funcionan en todas partes:
 Help.Global.2 = {8} abre esta ayuda. {7} cambia cuánto se dice.

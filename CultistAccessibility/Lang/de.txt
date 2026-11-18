@@ -339,6 +339,7 @@ Help.Mansus.4 = Jede Karte wartet an einem benannten Ort des Weges, mit seiner L
 Help.Picker.Title = Aus einer Liste wählen
 Help.Picker.1 = Pfeil auf und ab bewegen durch die Auswahl, Eingabe wählt, Escape bricht ab.
 Help.Picker.2 = {2} liest alles über die fokussierte Auswahl.
+Help.Picker.3 = Die Karten, die in einen Slot passen, stehen in denselben Abschnitten und derselben Reihenfolge wie in der Gruppe Karten: Bild ab und Bild auf springen zwischen den Abschnitten, {0} liest die ganze Liste.
 
 Help.Global.1 = Tasten, die überall funktionieren:
 Help.Global.2 = {8} öffnet diese Hilfe. {7} ändert, wie viel gesagt wird.

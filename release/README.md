@@ -86,7 +86,7 @@ In a verb window:
 | Key | Action |
 |---|---|
 | Up / Down | Story text, slots, Start, cards inside, results, Collect all, aspect totals |
-| Enter on a slot | List the cards on the table that fit it (the first choice empties a full slot) |
+| Enter on a slot | List the cards on the table that fit it, in the same sections as the Cards group: Page Up / Down jump between sections, A reads the list (the first choice empties a full slot) |
 | Delete or Backspace | Take the card out of the focused slot |
 | Enter on Start (or the game's S key) | Begin the recipe |
 | Enter on a face-down result | Turn it over; Enter again takes it to the table |

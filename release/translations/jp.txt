@@ -328,6 +328,7 @@ Help.Mansus.4 = 各カードは道の名前のある場所で待っており、�
 Help.Picker.Title = 一覧から選ぶ
 Help.Picker.1 = 上下の矢印キーで選択肢を移動、Enter で決定、Escape でキャンセルします。
 Help.Picker.2 = {2} でフォーカス中の選択肢のすべてを読みます。
+Help.Picker.3 = スロットに合うカードは、カードグループと同じセクションと順番で並びます。Page Down と Page Up でセクション間を移動し、{0} で一覧全体を読みます。
 
 Help.Global.1 = どこでも使えるキー:
 Help.Global.2 = {8} でこのヘルプを開きます。{7} で読み上げの詳しさを変えます。
