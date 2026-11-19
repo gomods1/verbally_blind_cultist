@@ -59,6 +59,7 @@ On the table:
 | Enter on a card | List the verbs that can take it; Enter puts the card in |
 | Page Down / Page Up | In Cards: next section; start of this section, or the previous one |
 | 1 to 9 on a card | Put this card, and every card with the same name, in your own section with that number |
+| Ctrl + number on a card | Hold Ctrl, type a section number up to 99, release Ctrl: same, for sections 10 to 99 |
 | 0 on a card | Give it back to its automatic section |
 | H | Your character and the status bar: health, passion, reason, funds and the game speed |
 | T | Game speed, every busy verb with its time left (soonest first), finished verbs, decaying cards |
@@ -72,7 +73,8 @@ A reads the whole group section by section, and the Table buffer lists the cards
 
 You can also sort cards yourself. Press a number from 1 to 9 on a card: that card, and every card with the same name,
 moves to your section with that number (Section 1, Section 2...), and your sections come first in the Cards group.
-Cards of that name that arrive later join the same section. 0 gives the card back to its automatic section. Your
+For more than nine sections, hold Ctrl, type the
+number (one or two digits, so up to 99; each digit is read as you type) and release Ctrl. Cards of that name that arrive later join the same section. 0 gives the card back to its automatic section. Your
 choices are kept in `CultistAccessibility_sections.txt` next to the mod and apply to every game. A face-down card
 has to be turned over first. The number keys replace the game's 1, 2 and 3 zoom levels, which change nothing you can
 hear.

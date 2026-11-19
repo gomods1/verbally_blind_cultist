@@ -357,11 +357,17 @@ namespace CultistAccessibility.Tabletop
             return GameAccess.DominionSpheres(s, SituationDominionEnum.Output).Sum(x => x.GetTotalElementsCount());
         }
 
-        public static string RecipeLabel(Situation s)
+        public static string RecipeLabel(Situation s) => RecipeLabel(s, false);
+
+        /// <summary>
+        /// The title of the verb's note: the page on screen, or with latest the newest page (events: the game adds a
+        /// page and turns to it with an animation, so the page on screen is still the old one for a moment).
+        /// </summary>
+        public static string RecipeLabel(Situation s, bool latest)
         {
             try
             {
-                VisibleNote(s, out string label, out _);
+                Note(s, latest, out string label, out _);
                 if (string.IsNullOrWhiteSpace(label) || label == ".") label = CurrentEntity(s.CurrentRecipe)?.Label;
                 return TextCleaner.Clean(label);
             }
@@ -371,11 +377,13 @@ namespace CultistAccessibility.Tabletop
             }
         }
 
-        public static string RecipeText(Situation s)
+        public static string RecipeText(Situation s) => RecipeText(s, false);
+
+        public static string RecipeText(Situation s, bool latest)
         {
             try
             {
-                VisibleNote(s, out _, out string text);
+                Note(s, latest, out _, out string text);
                 return TextCleaner.CleanMultiline(text);
             }
             catch { return ""; }
@@ -387,11 +395,23 @@ namespace CultistAccessibility.Tabletop
         /// latest note is written again the way the game writes it for the current state (RecipeNote), in the
         /// current language, when the saved one matches neither its title nor its text. Older pages stay as saved.
         /// </summary>
-        public static void VisibleNote(Situation s, out string title, out string text)
+        public static void VisibleNote(Situation s, out string title, out string text) => Note(s, false, out title, out text);
+
+        private static void Note(Situation s, bool latest, out string title, out string text)
         {
-            title = s.MetafictionalLabel;
-            text = s.MetafictionalDescription;
-            Relocalise(s, GameAccess.GetNotes(s)?.GetVisibleToken(), ref title, ref text);
+            var notes = GameAccess.GetNotes(s);
+            Token token = notes == null ? null : latest ? notes.GetLastToken() : notes.GetVisibleToken();
+            if (token != null && token.IsValid())
+            {
+                title = token.Payload.MetafictionalLabel;
+                text = token.Payload.MetafictionalDescription;
+            }
+            else
+            {
+                title = s.MetafictionalLabel;
+                text = s.MetafictionalDescription;
+            }
+            Relocalise(s, token, ref title, ref text);
         }
 
         /// <summary>One page of the verb's notes, title and text, the latest one in the current language.</summary>

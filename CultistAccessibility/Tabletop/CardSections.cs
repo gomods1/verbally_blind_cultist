@@ -11,8 +11,8 @@ namespace CultistAccessibility.Tabletop
     /// Sorts table cards into sections by kind, the way sighted players arrange the table by hand. The kind comes
     /// from the card's aspects (core content, checked against content/core/elements): the first rule that matches
     /// wins, and the rule order is the order of the sections in the Cards list.
-    /// The player can also put a kind of card (every card with the same id, so the same name) into one of nine
-    /// numbered sections of their own, listed before the automatic ones. Those choices are kept in
+    /// The player can also put a kind of card (every card with the same id, so the same name) into one of the
+    /// numbered sections of their own (1 to 99), listed before the automatic ones. Those choices are kept in
     /// CultistAccessibility_sections.txt next to the dll (one "elementid=N" per line), for every save.
     /// </summary>
     internal static class CardSections
@@ -47,10 +47,10 @@ namespace CultistAccessibility.Tabletop
         private static int OtherIndex => Rules.Length;
         private static int FaceDownIndex => Rules.Length + 1;
 
-        /// <summary>Highest player section number (keys 1 to 9).</summary>
-        public const int CustomCount = 9;
+        /// <summary>Highest player section number (keys 1 to 9, Ctrl + digits up to 99).</summary>
+        public const int CustomCount = 99;
 
-        // Player sections take the indexes -9..-1, so they sort before the automatic ones.
+        // Player sections take the indexes -99..-1, so they sort before the automatic ones.
         private static int CustomIndex(int number) => number - CustomCount - 1;
 
         private static Dictionary<string, int> _custom;
@@ -86,7 +86,7 @@ namespace CultistAccessibility.Tabletop
         {
             try
             {
-                var lines = new List<string> { "# Cultist Simulator Accessibility: your card sections (card id = section 1 to 9)." };
+                var lines = new List<string> { "# Cultist Simulator Accessibility: your card sections (card id = section 1 to 99)." };
                 lines.AddRange(Custom.OrderBy(kv => kv.Value).ThenBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => kv.Key + "=" + kv.Value));
                 File.WriteAllLines(FilePath, lines.ToArray());
             }
@@ -96,13 +96,13 @@ namespace CultistAccessibility.Tabletop
             }
         }
 
-        /// <summary>The player's section (1 to 9) for this kind of card, or 0.</summary>
+        /// <summary>The player's section (1 to 99) for this kind of card, or 0.</summary>
         public static int CustomSectionOf(string entityId)
         {
             return entityId != null && Custom.TryGetValue(entityId, out int n) ? n : 0;
         }
 
-        /// <summary>Put every card with this id in section 1 to 9; 0 gives it back to its automatic section.</summary>
+        /// <summary>Put every card with this id in section 1 to 99; 0 gives it back to its automatic section.</summary>
         public static void Assign(string entityId, int number)
         {
             if (string.IsNullOrEmpty(entityId)) return;

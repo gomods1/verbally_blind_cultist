@@ -126,7 +126,7 @@ namespace CultistAccessibility.Tabletop
                 {
                     string text = Strings.VerbAppeared(Describer.VerbName(s));
                     if (s.StateIdentifier == StateEnum.Ongoing)
-                        text += ". " + TextCleaner.Join(Describer.RecipeLabel(s), Strings.TimeLeft(GameAccess.FormatTime(s.TimeRemaining)));
+                        text += ". " + TextCleaner.Join(Describer.RecipeLabel(s, true), Strings.TimeLeft(GameAccess.FormatTime(s.TimeRemaining)));
                     Speech.SayEvent(text);
                 }
                 return;
@@ -148,9 +148,9 @@ namespace CultistAccessibility.Tabletop
                 {
                     string time = GameAccess.FormatTime(s.TimeRemaining);
                     if (was == StateEnum.RequiringExecution || was == StateEnum.Ongoing)
-                        Speech.SayEvent(Strings.VerbContinues(Describer.VerbName(s), Describer.RecipeLabel(s), time));
+                        Speech.SayEvent(Strings.VerbContinues(Describer.VerbName(s), Describer.RecipeLabel(s, true), time));
                     else
-                        Speech.SayEvent(Strings.VerbStarted(Describer.VerbName(s), Describer.RecipeLabel(s), time));
+                        Speech.SayEvent(Strings.VerbStarted(Describer.VerbName(s), Describer.RecipeLabel(s, true), time));
                     StoreStory(s);
                 }
                 else if (now == StateEnum.Complete)
@@ -176,9 +176,9 @@ namespace CultistAccessibility.Tabletop
                     if (ModConfig.AnnounceSituationStarted.Value)
                     {
                         string line = prediction
-                            ? Strings.VerbWillBecome(Describer.VerbName(s), Describer.RecipeLabel(s))
-                            : Strings.VerbContinues(Describer.VerbName(s), Describer.RecipeLabel(s), GameAccess.FormatTime(s.TimeRemaining));
-                        if (prediction && s.IsOpen) line = TextCleaner.Sentences(new[] { line, Describer.RecipeText(s) });
+                            ? Strings.VerbWillBecome(Describer.VerbName(s), Describer.RecipeLabel(s, true))
+                            : Strings.VerbContinues(Describer.VerbName(s), Describer.RecipeLabel(s, true), GameAccess.FormatTime(s.TimeRemaining));
+                        if (prediction && s.IsOpen) line = TextCleaner.Sentences(new[] { line, Describer.RecipeText(s, true) });
                         Speech.SayEvent(line);
                     }
                     StoreStory(s);
@@ -187,7 +187,7 @@ namespace CultistAccessibility.Tabletop
                 if (!snap.Warned && ModConfig.AnnounceTimerWarnings.Value && IsDangerous(s) && s.TimeRemaining <= ModConfig.TimerWarningSeconds.Value && s.TimeRemaining > 0f)
                 {
                     snap.Warned = true;
-                    Speech.SayEvent(TextCleaner.Join(Strings.VerbDanger(Describer.VerbName(s), GameAccess.FormatTime(s.TimeRemaining)), Describer.RecipeLabel(s)));
+                    Speech.SayEvent(TextCleaner.Join(Strings.VerbDanger(Describer.VerbName(s), GameAccess.FormatTime(s.TimeRemaining)), Describer.RecipeLabel(s, true)));
                 }
             }
         }
@@ -249,16 +249,16 @@ namespace CultistAccessibility.Tabletop
 
         private static void StoreStory(Situation s)
         {
-            string text = Describer.RecipeText(s);
+            string text = Describer.RecipeText(s, true);
             if (string.IsNullOrEmpty(text)) return;
-            BufferManager.AddStory(Describer.VerbName(s) + ": " + Describer.RecipeLabel(s) + ". " + text);
+            BufferManager.AddStory(Describer.VerbName(s) + ": " + Describer.RecipeLabel(s, true) + ". " + text);
         }
 
         private static void AnnounceCompletion(Situation s)
         {
             string verb = Describer.VerbName(s);
-            string recipe = Describer.RecipeLabel(s);
-            string text = Describer.RecipeText(s);
+            string recipe = Describer.RecipeLabel(s, true);
+            string text = Describer.RecipeText(s, true);
             if (!string.IsNullOrEmpty(text)) BufferManager.AddStory(verb + ": " + recipe + ". " + text);
             if (!ModConfig.AnnounceSituationCompleted.Value) return;
             string line = Strings.VerbCompleted(verb, recipe);

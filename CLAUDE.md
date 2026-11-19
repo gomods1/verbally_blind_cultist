@@ -35,7 +35,7 @@ kbpedestalup/down), Escape close window / open options (kbabort). Mouse wheel zo
 ### Mod keys
 Arrows, Enter, Home/End, Page Up/Down, Delete/Backspace (navigation, owned by the mod); F1 help; F2 verbosity;
 R repeat; I inspect; A read screen/group; H status; T timers; G next completed verb; 0-9 on a table card: the
-player's card sections (saved in CultistAccessibility_sections.txt next to the dll); Ctrl+arrows review buffers;
+player's card sections (Ctrl held + up to two digits, used on Ctrl release: sections up to 99) (saved in CultistAccessibility_sections.txt next to the dll); Ctrl+arrows review buffers;
 Ctrl+Shift+D debug dump (DebugLogging). Developer test keys (config DeveloperTestKeys, default false):
 Ctrl+Shift+F5 Contentment card, F6 Despair countdown, F7 save now, F9 Mansus portal, F10 basic cards, F11 ending
 (unlocks a real achievement, see Pitfalls); any screen: Ctrl+Shift+F4 game notification, F3 menu save messages
@@ -69,7 +69,7 @@ Navigation/                  generic uGUI navigator (menus, overlays, options, l
 Tabletop/
   TabletopNavigator          Board (Verbs / Cards / Controls), verb Window, Mansus, modal Pickers
   Describer                  spoken summaries and detail lines for cards, verbs, slots, aspects, deck draws
-  CardSections               Cards-list sections: the player's (keys 1-9, by element id), then by kind (first
+  CardSections               Cards-list sections: the player's (keys 1-9, Ctrl+digits to 99, by element id), then by kind (first
                              matching aspect rule); Page Up/Down, Table buffer
   GameActions                all state changes, through the game's own code paths
   GameAccess                 read-only game state helpers
@@ -126,6 +126,9 @@ SpeechHost/                  x64 Prism host process
   screen x for left/centre/right, and lists each place's deck from the consequence recipe's `deckeffects`.
 - The translations do not all call the Mansus "Mansus": French "la Manse", Spanish "el Dominio", German "der Mansus"
   (masculine), Russian "Обитель" (opening quote in `core/cultures/<id>/culture.json`). Mod texts use the game's word.
+- A new note page (a prediction from a running recipe's slot, a linked recipe) is added last, but the window turns
+  to it with an animation: `GetVisibleToken` is still the old page for a moment. Event lines read the latest note
+  (`Describer.RecipeLabel(s, latest: true)`); the window reads the page on screen.
 - Greedy slots grab their card (`GreedyAngel.GrabStack`) as the recipe starts, before the 4 Hz poll sees it: the
   patch queues the line (`TabletopEvents.QueueGrab`) and the poll speaks it after "continues" and "wants a card".
 - Some game slots have no label (Health, HQ rooms, research Reason/Erudition...); the game shows none and their id

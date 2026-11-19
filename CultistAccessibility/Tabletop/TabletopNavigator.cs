@@ -685,16 +685,47 @@ namespace CultistAccessibility.Tabletop
             Key.Numpad0, Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9
         };
 
-        /// <summary>The number key pressed this frame (0 to 9), if any.</summary>
-        private static int? SectionKey()
+        private static int? DigitPressed(bool withCtrl)
         {
             for (int i = 0; i < DigitKeys.Length; i++)
-                if (KeyInput.Hotkey(DigitKeys[i]) || KeyInput.Hotkey(NumpadKeys[i])) return i;
+                if (withCtrl ? KeyInput.Pressed(DigitKeys[i]) || KeyInput.Pressed(NumpadKeys[i])
+                    : KeyInput.Hotkey(DigitKeys[i]) || KeyInput.Hotkey(NumpadKeys[i])) return i;
             return null;
         }
 
+        // Ctrl held + digits typed: a section number of up to two digits, used when Ctrl is released.
+        private string _sectionDigits;
+        private int _sectionEntryFrame = -10;
+
         /// <summary>
-        /// 1 to 9 on a table card puts every card of that kind (same id, same name) in the player's numbered section;
+        /// The section number chosen this frame: a plain number key (0 to 9), or the digits typed while Ctrl was held
+        /// (0 to 99), on the frame Ctrl is released. An entry is dropped when the board stopped reading keys meanwhile.
+        /// </summary>
+        private int? SectionKey()
+        {
+            if (KeyInput.Ctrl && !KeyInput.Alt)
+            {
+                if (_sectionDigits != null && _sectionEntryFrame < Time.frameCount - 1) _sectionDigits = null;
+                _sectionEntryFrame = Time.frameCount;
+                if (DigitPressed(true) is int d)
+                {
+                    if (_sectionDigits == null) _sectionDigits = "";
+                    if (_sectionDigits.Length < 2) _sectionDigits += d;
+                    Speech.Say(int.Parse(_sectionDigits).ToString());
+                }
+                return null;
+            }
+            if (_sectionDigits != null)
+            {
+                string digits = _sectionDigits;
+                _sectionDigits = null;
+                if (_sectionEntryFrame >= Time.frameCount - 1) return int.Parse(digits);
+            }
+            return DigitPressed(false);
+        }
+
+        /// <summary>
+        /// 1 to 9 (or Ctrl + up to two digits, 1 to 99) on a table card puts every card of that kind (same id, same name) in the player's numbered section;
         /// 0 gives it back to its automatic section. Focus stays on the card, which moves with its section.
         /// </summary>
         private void AssignSection(int number)
