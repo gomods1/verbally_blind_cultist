@@ -96,8 +96,11 @@ In a verb window:
 | Page Up / Page Down | Turn the pages of a long story (also Left / Right on the story line) |
 | Escape | Close the window |
 
-During an expedition, the obstacles inside the Explore window come first, read as "Obstacle:" with what overcomes
-them (for example Watchers: they can be fought, seduced, or deceived). I on the Explore verb lists them as well.
+During an expedition, the Explore window lists the obstacles still ahead, in the order the expedition will face
+them, just above the aspects: one line each, "Obstacle:" with the game's own text for it, which names the aspects
+that overcome it (for example Treacherous Ground: we need Lantern to show us a way, or Forge to make one). The
+obstacle being faced now is not in the list: the window's story page tells it, with your odds. After a failure it
+comes back, since the expedition tries it again. I on the Explore verb lists them as well.
 
 In the Mansus: Up / Down move between the places. Enter on a face-up card takes it; Enter on a face-down card turns it over, Enter again takes it back.
 Each place is named, with its position, as on the map: the middle place shares the name of the Way and its card is
@@ -116,7 +119,9 @@ Verbs starting, continuing, finishing (with how many cards are waiting), appeari
 that opens a slot and wants a card (the slot is also named when you focus the verb and in the T readout), and what
 the verb will become when you put a card there; a warning when a dangerous countdown is about to run out; cards that decay, change or vanish on the table; cards that arrive on the
 table; greedy slots taking cards; the game's pop-up messages; pause and speed changes; the Mansus. Everything
-announced, except pause and speed changes, is also kept in the Events review buffer, and the story texts of finished verbs in the Story buffer.
+announced, except pause and speed changes, is also kept in the Events review buffer. The Story buffer tells your character's story: when a verb finishes, all
+the pages of its story go there once, in order (opening a verb or hovering it adds nothing), along with the Mansus
+dreams and the ending.
 The events are also written to `CultistAccessibility_events.log` next to the mod, which helps with bug reports.
 
 ## Languages

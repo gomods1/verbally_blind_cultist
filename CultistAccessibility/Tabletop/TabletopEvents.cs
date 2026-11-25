@@ -151,7 +151,6 @@ namespace CultistAccessibility.Tabletop
                         Speech.SayEvent(Strings.VerbContinues(Describer.VerbName(s), Describer.RecipeLabel(s, true), time));
                     else
                         Speech.SayEvent(Strings.VerbStarted(Describer.VerbName(s), Describer.RecipeLabel(s, true), time));
-                    StoreStory(s);
                 }
                 else if (now == StateEnum.Complete)
                 {
@@ -181,7 +180,6 @@ namespace CultistAccessibility.Tabletop
                         if (prediction && s.IsOpen) line = TextCleaner.Sentences(new[] { line, Describer.RecipeText(s, true) });
                         Speech.SayEvent(line);
                     }
-                    StoreStory(s);
                 }
                 AnnounceNewSlots(s, snap);
                 if (!snap.Warned && ModConfig.AnnounceTimerWarnings.Value && IsDangerous(s) && s.TimeRemaining <= ModConfig.TimerWarningSeconds.Value && s.TimeRemaining > 0f)
@@ -247,19 +245,14 @@ namespace CultistAccessibility.Tabletop
             }
         }
 
-        private static void StoreStory(Situation s)
-        {
-            string text = Describer.RecipeText(s, true);
-            if (string.IsNullOrEmpty(text)) return;
-            BufferManager.AddStory(Describer.VerbName(s) + ": " + Describer.RecipeLabel(s, true) + ". " + text);
-        }
-
         private static void AnnounceCompletion(Situation s)
         {
             string verb = Describer.VerbName(s);
             string recipe = Describer.RecipeLabel(s, true);
             string text = Describer.RecipeText(s, true);
-            if (!string.IsNullOrEmpty(text)) BufferManager.AddStory(verb + ": " + recipe + ". " + text);
+            // The Story buffer tells the character's story: each verb's pages once, in order, when it completes.
+            string story = Describer.StoryPages(s);
+            if (!string.IsNullOrEmpty(story)) BufferManager.AddStory(verb + ":\n" + story);
             if (!ModConfig.AnnounceSituationCompleted.Value) return;
             string line = Strings.VerbCompleted(verb, recipe);
             int n = Describer.OutputCount(s);

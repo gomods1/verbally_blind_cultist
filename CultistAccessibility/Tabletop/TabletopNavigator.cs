@@ -950,7 +950,6 @@ namespace CultistAccessibility.Tabletop
                 int n = Describer.OutputCount(s);
                 if (n > 0) speech.Add(Strings.CardsWaiting(n));
             }
-            if (!string.IsNullOrEmpty(text)) BufferManager.AddStory(Describer.VerbName(s) + ": " + (string.IsNullOrEmpty(recipe) ? "" : recipe + ". ") + text);
             var list = BuildWindow(s);
             // Default focus: the first empty slot when setting up, the first result when done, else the story.
             NavEntry first = null;
@@ -1012,15 +1011,14 @@ namespace CultistAccessibility.Tabletop
                     break;
                 case StateEnum.Ongoing:
                 case StateEnum.Starting:
-                    // Expedition obstacles first, with what overcomes them, as the game shows them in the window.
                     foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage))
-                        .OrderBy(t => Describer.IsObstacle(t) ? 0 : 1))
+                        .Where(t => !Describer.IsObstacle(t)))
                     {
                         var c = card;
                         list.Add(new NavEntry
                         {
                             Key = c,
-                            Summary = () => Describer.IsObstacle(c) ? Describer.ObstacleSummary(c) : Strings.StoredHeading + ": " + Describer.CardSummary(c),
+                            Summary = () => Strings.StoredHeading + ": " + Describer.CardSummary(c),
                             Details = () => Describer.CardDetails(c),
                             Activate = () => Inspect(new NavEntry { Summary = () => Describer.CardSummary(c), Details = () => Describer.CardDetails(c) })
                         });
@@ -1034,6 +1032,19 @@ namespace CultistAccessibility.Tabletop
                             Summary = () => Describer.DeckEffects(s),
                             Details = () => Describer.DeckDetails(s),
                             Activate = () => Speech.Say(Describer.DeckEffects(s))
+                        });
+                    }
+                    // Expedition obstacles still ahead, in the order they come, with what overcomes them (just above
+                    // the aspects); the one being faced is the window's page.
+                    foreach (var card in Describer.UpcomingObstacles(s))
+                    {
+                        var c = card;
+                        list.Add(new NavEntry
+                        {
+                            Key = c,
+                            Summary = () => Describer.ObstacleSummary(c),
+                            Details = () => Describer.CardDetails(c),
+                            Activate = () => Speech.Say(Describer.ObstacleSummary(c))
                         });
                     }
                     break;
@@ -1196,8 +1207,6 @@ namespace CultistAccessibility.Tabletop
                 if (label == Describer.VerbName(s)) label = TextCleaner.Join(label, Describer.StateText(s));
                 else if (Describer.CanStart(s)) label += ", " + Strings.StateReady;
                 Speech.Say(label);
-                string text = Describer.RecipeText(s);
-                if (!string.IsNullOrEmpty(text)) BufferManager.AddStory(Describer.VerbName(s) + ": " + label + ". " + text);
             }
         }
 

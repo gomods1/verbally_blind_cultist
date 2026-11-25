@@ -131,6 +131,14 @@ SpeechHost/                  x64 Prism host process
   (`Describer.RecipeLabel(s, latest: true)`); the window reads the page on screen.
 - Greedy slots grab their card (`GreedyAngel.GrabStack`) as the recipe starts, before the 4 Hz poll sees it: the
   patch queues the line (`TabletopEvents.QueueGrab`) and the poll speaks it after "continues" and "wants a card".
+- Expedition obstacles are cards in the Explore verb's Storage. Each one has an "encounter" recipe: the only recipe
+  that requires its element and has alternatives (`explorevault<kind>_<name>_encounter`, linked from
+  `explorevaulttick` in facing order). The encounter's StartLabel/StartDescription names the aspects that overcome
+  the obstacle; `Describer.UpcomingObstacles` lists the obstacles in the tick's link order, leaving out the one
+  whose encounter, attempts or outcomes are running now.
+- The Story buffer is filled only on completion (`TabletopEvents.AnnounceCompletion`, all note pages in order via
+  `Describer.StoryPages`), plus the Mansus dream and the ending: opening, hovering, starting or predicting adds
+  nothing (tester request).
 - Some game slots have no label (Health, HQ rooms, research Reason/Erudition...); the game shows none and their id
   is English, so `Describer.SlotLabel` names them by their required aspects.
 - `Ending.DefaultEnding()` has null achievements and crashes the game's chronicler; the dev ending key uses

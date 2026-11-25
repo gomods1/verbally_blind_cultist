@@ -69,11 +69,142 @@ namespace CultistAccessibility.Tabletop
             }
         }
 
-        /// <summary>"Obstacle: Watchers. They can be fought, seduced, or deceived.": the name and what overcomes it.</summary>
+        /// <summary>
+        /// "Obstacle: Treacherous Ground. Sucking mud... We need Lantern to show us a way, or Forge to make one.": the
+        /// base title and text of the recipe that faces the obstacle (what the game shows when it comes up), else the
+        /// card's name and description.
+        /// </summary>
         public static string ObstacleSummary(Token token)
         {
-            var p = token.Payload;
-            return TextCleaner.Sentences(new[] { Strings.Obstacle(CardSummary(token)), TextCleaner.Clean(p.Description) });
+            var encounter = ObstacleEncounter(token);
+            if (encounter != null)
+            {
+                string text = TextCleaner.CleanMultiline(encounter.StartDescription).Replace("\r", "").Replace('\n', ' ');
+                if (!string.IsNullOrEmpty(text))
+                {
+                    // The title as RecipeNote.StartDescription picks it.
+                    string title = !string.IsNullOrWhiteSpace(encounter.StartLabel) && encounter.StartLabel != "." ? encounter.StartLabel : encounter.Label;
+                    return TextCleaner.Sentences(new[] { Strings.Obstacle(TextCleaner.Clean(title)), text });
+                }
+            }
+            return TextCleaner.Sentences(new[] { Strings.Obstacle(CardSummary(token)), TextCleaner.Clean(token.Payload.Description) });
+        }
+
+        /// <summary>
+        /// The obstacles of an expedition still ahead, in the order the game faces them (the order of the encounters
+        /// in explorevaulttick's links: the first one whose obstacle is present runs). The obstacle being faced now
+        /// (its encounter, the attempt chosen by aspect, success or failure) is left out: the window's page tells it.
+        /// A failure brings it back, since the expedition then faces it again.
+        /// </summary>
+        public static List<Token> UpcomingObstacles(Situation s)
+        {
+            var obstacles = GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage)).Where(IsObstacle).ToList();
+            if (obstacles.Count == 0) return obstacles;
+            EnsureEncounters();
+            string current = null;
+            try { current = s.CurrentRecipe?.Id; } catch { }
+            return obstacles
+                .Where(t => current == null || !EncounterFamily(EncounterIdOf(t)).Contains(current))
+                .OrderBy(t => EncounterIdOf(t) != null && _encounterOrder.TryGetValue(EncounterIdOf(t), out int i) ? i : int.MaxValue)
+                .ToList();
+        }
+
+        // Obstacle element id -> its encounter recipe id; encounter id -> position in the recipe that links to it.
+        // Ids only: the Compendium is rebuilt (new entities) when the language changes.
+        private static Dictionary<string, string> _encounterOf;
+        private static Dictionary<string, int> _encounterOrder;
+
+        private static string EncounterIdOf(Token token)
+        {
+            try
+            {
+                EnsureEncounters();
+                return _encounterOf.TryGetValue(token.Payload.EntityId, out string id) ? id : null;
+            }
+            catch { return null; }
+        }
+
+        private static Recipe ObstacleEncounter(Token token)
+        {
+            string id = EncounterIdOf(token);
+            if (id == null) return null;
+            try
+            {
+                var r = GameAccess.Compendium?.GetEntityById<Recipe>(id);
+                return r != null && r.IsValid() ? r : null;
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// An obstacle's encounter is the recipe that requires its element and has alternatives (one per aspect and
+        /// strength): explorevaultperil_treacherousground_encounter for peril_treacherousground, and so on.
+        /// </summary>
+        private static void EnsureEncounters()
+        {
+            if (_encounterOf != null) return;
+            var of = new Dictionary<string, string>();
+            var order = new Dictionary<string, int>();
+            var comp = GameAccess.Compendium;
+            if (comp == null) return;
+            try
+            {
+                var recipes = comp.GetEntitiesAsList<Recipe>();
+                var obstacleIds = new HashSet<string>(comp.GetEntitiesAsList<Element>()
+                    .Where(e => !e.IsAspect && e.Aspects != null && ObstacleAspects.Any(a => e.Aspects.ContainsKey(a)))
+                    .Select(e => e.Id));
+                foreach (var r in recipes)
+                {
+                    if (r.Alt == null || r.Alt.Count == 0 || r.Requirements == null) continue;
+                    foreach (var kv in r.Requirements)
+                    {
+                        if (!obstacleIds.Contains(kv.Key) || of.ContainsKey(kv.Key)) continue;
+                        if (!int.TryParse(kv.Value, out int n) || n <= 0) continue;
+                        of[kv.Key] = r.Id;
+                    }
+                }
+                var encounters = new HashSet<string>(of.Values);
+                foreach (var r in recipes)
+                {
+                    if (r.Linked == null) continue;
+                    for (int i = 0; i < r.Linked.Count; i++)
+                    {
+                        string id = r.Linked[i]?.Id;
+                        if (id != null && encounters.Contains(id) && !order.ContainsKey(id)) order[id] = i;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.LogDebug("Obstacle encounters failed: " + ex.Message);
+            }
+            _encounterOf = of;
+            _encounterOrder = order;
+        }
+
+        /// <summary>The encounter, its attempts (alternatives) and their outcomes (links).</summary>
+        private static HashSet<string> EncounterFamily(string encounterId)
+        {
+            var family = new HashSet<string>();
+            if (encounterId == null) return family;
+            family.Add(encounterId);
+            try
+            {
+                var comp = GameAccess.Compendium;
+                var encounter = comp?.GetEntityById<Recipe>(encounterId);
+                if (encounter?.Alt == null) return family;
+                foreach (var alt in encounter.Alt)
+                {
+                    if (alt?.Id == null) continue;
+                    family.Add(alt.Id);
+                    var attempt = comp.GetEntityById<Recipe>(alt.Id);
+                    if (attempt?.Linked == null) continue;
+                    foreach (var link in attempt.Linked)
+                        if (link?.Id != null) family.Add(link.Id);
+                }
+            }
+            catch { }
+            return family;
         }
 
         public static List<string> CardDetails(Token token)
@@ -423,6 +554,43 @@ namespace CultistAccessibility.Tabletop
             return TextCleaner.Sentences(new[] { title, text });
         }
 
+        /// <summary>
+        /// Every page of the verb's notes in order, one paragraph per page (title and text), for the Story buffer when
+        /// the verb completes. The game keeps the whole chain there (start, linked recipes, end): a withdrawn ongoing
+        /// prediction removes its own page (Situation.RemoveLastNote), repeated notes are not added (IsRedundantNote).
+        /// </summary>
+        public static string StoryPages(Situation s)
+        {
+            var parts = new List<string>();
+            try
+            {
+                var notes = GameAccess.GetNotes(s);
+                if (notes != null)
+                {
+                    foreach (var page in notes.Tokens.ToList())
+                    {
+                        if (page == null || !page.IsValid()) continue;
+                        string title = page.Payload.MetafictionalLabel;
+                        string text = page.Payload.MetafictionalDescription;
+                        Relocalise(s, page, ref title, ref text);
+                        text = TextCleaner.CleanMultiline(text);
+                        if (string.IsNullOrEmpty(text)) continue;
+                        parts.Add(TextCleaner.Sentences(new[] { TextCleaner.Clean(title), text.Replace("\r", "").Replace('\n', ' ') }));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Plugin.LogDebug("Story pages failed: " + ex.Message);
+            }
+            if (parts.Count == 0)
+            {
+                string text = RecipeText(s, true);
+                if (!string.IsNullOrEmpty(text)) parts.Add(TextCleaner.Sentences(new[] { RecipeLabel(s, true), text }));
+            }
+            return string.Join("\n", parts.ToArray());
+        }
+
         private static void Relocalise(Situation s, Token note, ref string title, ref string text)
         {
             try
@@ -544,12 +712,13 @@ namespace CultistAccessibility.Tabletop
             if (!string.IsNullOrEmpty(recipe) && recipe != VerbName(s)) lines.Add(Strings.Recipe + ": " + recipe);
             if (text != verbDesc) lines.AddRange(TextCleaner.SplitIntoSpeechItems(text));
             foreach (var slot in GameAccess.ActiveThresholds(s)) lines.Add(SlotSummary(slot));
-            foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage)).OrderBy(t => IsObstacle(t) ? 0 : 1))
-                lines.Add(IsObstacle(card) ? ObstacleSummary(card) : Strings.StoredHeading + ": " + CardSummary(card));
+            foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Storage)).Where(t => !IsObstacle(t)))
+                lines.Add(Strings.StoredHeading + ": " + CardSummary(card));
             foreach (var card in GameAccess.SphereCards(GameAccess.DominionSpheres(s, SituationDominionEnum.Output)))
                 lines.Add(Strings.OutputHeading + ": " + CardSummary(card));
             string deck = DeckEffects(s);
             if (!string.IsNullOrEmpty(deck)) lines.Add(deck);
+            foreach (var card in UpcomingObstacles(s)) lines.Add(ObstacleSummary(card));
             string aspects = AspectSummary(SituationAspects(s));
             if (!string.IsNullOrEmpty(aspects)) lines.Add(Strings.Aspects + ": " + aspects);
             return lines;

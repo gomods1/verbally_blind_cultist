@@ -2,7 +2,7 @@
 # + README. No game code or assets are included.
 # The payload is staged in release\ and committed: the plugin references the game's own DLLs, so the GitHub
 # release workflow cannot build it and zips this folder instead. The local zip goes to dist\ (not committed).
-param([string]$Version = "1.5.0")
+param([string]$Version = "1.6.0")
 
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
